@@ -8,37 +8,34 @@
 import { ListNode } from "./ds_v1/LinkedList.js";
 
 function removeNthLastNode(head, n) {
-  let depth = findDepth(head);
+  let depth = 0;
   let current = head;
+  let potentialNodeToRemovePrev = null;
 
-  // If we need to remove the head node
-  if (depth === n) {
-    head = head.next;
-  } else {
-    let targetIndex = depth - n;
-    current = head;
-    let index = 0;
-
-    while (current) {
-      if (index === targetIndex) {
-        current.next = current.next ? current.next.next : null;
-        break;
-      }
-      current = current.next;
-      index++;
+  // First, calculate the depth of the linked list
+  while (current && potentialNodeToRemovePrev === null) {
+    depth++;
+    current = current.next;
+    if (depth === n + 1) {
+      potentialNodeToRemovePrev = head;
     }
+  }
+
+  // If we never set potentialNodeToRemovePrev, we're removing the head
+  if (potentialNodeToRemovePrev === null) {
+    return head.next;
+  }
+
+  while (current) {
+    current = current.next;
+    potentialNodeToRemovePrev = potentialNodeToRemovePrev.next;
+  }
+
+  // Remove the nth node from the end
+  if (potentialNodeToRemovePrev && potentialNodeToRemovePrev.next) {
+    potentialNodeToRemovePrev.next = potentialNodeToRemovePrev.next.next;
   }
 
   return head;
 }
-
-function findDepth(node) {
-  let depth = 0;
-  while (node) {
-    depth++;
-    node = node.next;
-  }
-  return depth;
-}
-
 export { removeNthLastNode };
