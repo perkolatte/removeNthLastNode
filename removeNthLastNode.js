@@ -8,38 +8,31 @@
 import { ListNode } from "./ds_v1/LinkedList.js";
 
 function removeNthLastNode(head, n) {
-  let depth = 0;
-  let lead = head; // This will advance n+1 steps ahead
-  let prevToRemove = null; // This will point to the node previous to the one to remove
+  if (!head || n <= 0) return head;
 
-  // First, advance `lead` while counting steps up to n+1
-  while (lead && prevToRemove === null) {
-    depth++;
+  // Anchor node before head (avoids special-case removal of head)
+  // Create anchor and set next explicitly to be robust if ListNode
+  // constructor doesn't accept a `next` argument.
+  const anchor = new ListNode(0);
+  anchor.next = head;
+  let lead = anchor;
+  let trail = anchor;
+
+  // Advance lead n+1 steps ahead; if n > length, return original head
+  for (let i = 0; i <= n; i++) {
     lead = lead.next;
-    // After advancing n+1 steps set prevToRemove=head to create the gap
-    if (depth === n + 1) {
-      prevToRemove = head;
-    }
+    if (!lead && i < n) return head;
   }
 
-  // If prevToRemove is null: n > length (invalid) => return head;
-  // if depth === n then remove head by returning head.next
-  if (prevToRemove === null) {
-    if (depth < n) return head;
-    return head.next;
-  }
-
-  // Now advance both lead and prevToRemove until lead reaches the end
+  // Move both pointers until lead reaches the end
   while (lead) {
     lead = lead.next;
-    prevToRemove = prevToRemove.next;
+    trail = trail.next;
   }
 
-  // Now prevToRemove points to the node before the one to remove
-  if (prevToRemove && prevToRemove.next) {
-    prevToRemove.next = prevToRemove.next.next;
-  }
+  // Remove the nth node from the end
+  if (trail.next) trail.next = trail.next.next;
 
-  return head;
+  return anchor.next;
 }
 export { removeNthLastNode };
